@@ -1,3 +1,4 @@
+{% import follow_unfollow_button.html %}
 {% macro user_card(card_user) %}
 <div class="col-lg-4 col-md-6 col-12">
     <div class="card user-card">
@@ -11,17 +12,7 @@
             <p>@{{ card_user.username }}</p>
             </a>
 
-            {% if g.card_user.is_following(user) %}
-            <form method="POST"
-                    action="/users/stop-following/{{ card_user.id }}">
-                <button class="btn btn-primary btn-sm">Unfollow</button>
-            </form>
-            {% else %}
-            <form method="POST" action="/users/follow/{{ card_user.id }}">
-                <button class="btn btn-outline-primary btn-sm">Follow</button>
-            </form>
-            {% endif %}
-
+            {{follow_unfollow_button(card_user)}}
         </div>
         <p class="card-bio">{{card_user.bio}}/p>
         </div>

@@ -1,10 +1,10 @@
 {% extends 'users/detail.html' %}
+{% import user_cards.html %}
 
 {% block user_details %}
   <div class="col-sm-9">
     <div class="row">
-      
-      {% import user_cards.html %}
+
       {% for follower in user.followers %}
         {{card_user(follower)}}
       {% endfor %}
