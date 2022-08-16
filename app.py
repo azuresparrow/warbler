@@ -23,7 +23,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
-
+db.create_all()
 
 ##############################################################################
 # User signup/login/logout
@@ -113,7 +113,9 @@ def login():
 def logout():
     """Handle logout of user."""
 
-    # IMPLEMENT THIS
+    session.pop(CURR_USER_KEY)
+    flash("Logged out.")
+    return redirect('/login')
 
 
 ##############################################################################
