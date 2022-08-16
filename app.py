@@ -52,6 +52,11 @@ def do_logout():
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
 
+def redirect_if_not_logged_in():
+    """redirect the user if not authenticated"""
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
@@ -112,9 +117,7 @@ def login():
 @app.route('/logout')
 def logout():
     """Handle logout of user."""
-
-    session.pop(CURR_USER_KEY)
-    flash("Logged out.")
+    do_logout()
     return redirect('/login')
 
 
@@ -159,9 +162,7 @@ def users_show(user_id):
 def show_following(user_id):
     """Show list of people this user is following."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    redirect_if_not_logged_in()
 
     user = User.query.get_or_404(user_id)
     return render_template('users/following.html', user=user)
@@ -171,9 +172,7 @@ def show_following(user_id):
 def users_followers(user_id):
     """Show list of followers of this user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    redirect_if_not_logged_in()
 
     user = User.query.get_or_404(user_id)
     return render_template('users/followers.html', user=user)
@@ -183,9 +182,7 @@ def users_followers(user_id):
 def add_follow(follow_id):
     """Add a follow for the currently-logged-in user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    redirect_if_not_logged_in()
 
     followed_user = User.query.get_or_404(follow_id)
     g.user.following.append(followed_user)
@@ -198,9 +195,7 @@ def add_follow(follow_id):
 def stop_following(follow_id):
     """Have currently-logged-in-user stop following this user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    redirect_if_not_logged_in()
 
     followed_user = User.query.get(follow_id)
     g.user.following.remove(followed_user)
@@ -212,17 +207,14 @@ def stop_following(follow_id):
 @app.route('/users/profile', methods=["GET", "POST"])
 def profile():
     """Update profile for current user."""
-
-    # IMPLEMENT THIS
+    redirect_if_not_logged_in()
 
 
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
     """Delete user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    redirect_if_not_logged_in()
 
     do_logout()
 
@@ -242,9 +234,7 @@ def messages_add():
     Show form if GET. If valid, update message and redirect to user page.
     """
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    redirect_if_not_logged_in()
 
     form = MessageForm()
 
@@ -270,9 +260,7 @@ def messages_show(message_id):
 def messages_destroy(message_id):
     """Delete a message."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    redirect_if_not_logged_in()
 
     msg = Message.query.get(message_id)
     db.session.delete(msg)
