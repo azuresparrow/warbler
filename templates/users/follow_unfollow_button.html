@@ -4,7 +4,7 @@
                 action="/users/stop-following/{{ target_user.id }}">
             <button class="btn btn-primary btn-sm">Unfollow</button>
         </form>
-        {% else %}
+    {% else %}
         <form method="POST" action="/users/follow/{{ target_user.id }}">
             <button class="btn btn-outline-primary btn-sm">Follow</button>
         </form>

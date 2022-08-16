@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% import follow_unfollow_button.html %}
+
 
 {% block content %}
 
@@ -39,6 +39,7 @@
               <button class="btn btn-outline-danger ml-2">Delete Profile</button>
             </form>
             {% elif g.user %}
+              {% import 'follow_unfollow_button.html' as follow_unfollow_button %}
               {{follow_unfollow_button(user.id)}}
             {% endif %}
           </div>
@@ -56,6 +57,7 @@
   </div>
 
   {% block user_details %}
+
   {% endblock %}
 
 </div>
