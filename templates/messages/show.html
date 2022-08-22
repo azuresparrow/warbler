@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% from 'users/follow_unfollow_button.html' import follow_unfollow_button with context %}
 {% block content %}
 
   <div class="bg"></div>
@@ -19,15 +19,8 @@
                         action="/messages/{{ message.id }}/delete">
                     <button class="btn btn-outline-danger">Delete</button>
                   </form>
-                {% elif g.user.is_following(message.user) %}
-                  <form method="POST"
-                        action="/users/stop-following/{{ message.user.id }}">
-                    <button class="btn btn-primary">Unfollow</button>
-                  </form>
                 {% else %}
-                  <form method="POST" action="/users/follow/{{ message.user.id }}">
-                    <button class="btn btn-outline-primary btn-sm">Follow</button>
-                  </form>
+                  {{follow_unfollow_button(message.user)}}
                 {% endif %}
               {% endif %}
             </div>
