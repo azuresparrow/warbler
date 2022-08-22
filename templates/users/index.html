@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'users/user_cards.html' import user_card with context %}
 {% block content %}
   {% if users|length == 0 %}
     <h3>Sorry, no users found</h3>
@@ -6,12 +7,9 @@
     <div class="row justify-content-end">
       <div class="col-sm-9">
         <div class="row">
-          
-          {% import user_cards.html %}
           {% for user in users %}
-            {{card_user(user)}}
+            {{user_card(user)}}
           {% endfor %}
-
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
-{% macro user_card(card_user) %}
-
+{% macro user_card(card_user) -%}
+{% from 'users/follow_unfollow_button.html' import follow_unfollow_button with context %}
 <div class="col-lg-4 col-md-6 col-12">
     <div class="card user-card">
         <div class="card-inner">
@@ -8,14 +8,13 @@
         </div>
         <div class="card-contents">
             <a href="/users/{{card_user.id }}" class="card-link">
-            <img src="{{card user.image_url }}" alt="Image for {{ card_user.username }}" class="card-image">
+            <img src="{{card_user.image_url }}" alt="Image for {{ card_user.username }}" class="card-image">
             <p>@{{ card_user.username }}</p>
             </a>
-            {% import 'follow_unfollow_button.html' as follow_unfollow_button %}
             {{follow_unfollow_button(card_user)}}
         </div>
-        <p class="card-bio">{{card_user.bio}}/p>
+        <p class="card-bio">{{card_user.bio}}</p>
         </div>
     </div>
 </div>
-{% endmacro %}
+{% endmacro -%}

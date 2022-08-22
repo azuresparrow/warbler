@@ -1,5 +1,5 @@
 {% macro follow_unfollow_button(target_user) %}
-    {% if g.target_user.is_following(user) %}
+    {% if g.user.is_following(target_user) %}
         <form method="POST"
                 action="/users/stop-following/{{ target_user.id }}">
             <button class="btn btn-primary btn-sm">Unfollow</button>

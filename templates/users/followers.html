@@ -1,15 +1,14 @@
 {% extends 'users/detail.html' %}
-{% import user_cards.html %}
+{% from 'users/user_cards.html' import user_card with context %}
+
 
 {% block user_details %}
   <div class="col-sm-9">
     <div class="row">
-
       {% for follower in user.followers %}
-        {{card_user(follower)}}
+        {{user_card(follower)}}
       {% endfor %}
 
     </div>
   </div>
-
 {% endblock %}
