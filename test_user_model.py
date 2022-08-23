@@ -50,6 +50,11 @@ class UserModelTestCase(TestCase):
         self.userB = userB
 
         self.client = app.test_client()
+    
+    def tearDown(self):
+        res = super().tearDown()
+        db.session.rollback()
+        return res
 
     def test_user_model(self):
         """Does basic model work?"""

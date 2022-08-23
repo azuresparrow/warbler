@@ -39,8 +39,8 @@ class MessageViewTestCase(TestCase):
     def setUp(self):
         """Create test client, add sample data."""
 
-        User.query.delete()
-        Message.query.delete()
+        db.drop_all()
+        db.create_all()
 
         self.client = app.test_client()
 
@@ -48,7 +48,7 @@ class MessageViewTestCase(TestCase):
                                     email="test@test.com",
                                     password="testuser",
                                     image_url=None)
-
+        self.testuser.id = 2930
         db.session.commit()
 
     def test_add_message(self):
@@ -72,3 +72,44 @@ class MessageViewTestCase(TestCase):
             msg = Message.query.one()
             self.assertEqual(msg.text, "Hello")
 
+    def test_add_no_session(self):
+        with self.client as c:
+            resp = c.post("/messages/new", data={"text": "Hello"}, follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Access unauthorized", str(resp.data))
+
+    def test_add_bad_user(self):
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] =2593850928390682309680
+            resp = c.post("/messages/new", data={"text": "Hello"}, follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Access unauthorized", str(resp.data))
+    
+    def test_message_delete(self):
+        message= Message(user_id=2930, text = "test", id=1000)
+        db.session.add(message)
+        db.session.commit()
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.testuser.id
+
+            resp = c.post("messages/1000/delete", follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
+
+            message = Message.query.get(1234)
+            self.assertIsNone(message)
+
+    def test_message_delete_fail(self):
+        with self.client as c:
+            message= Message(user_id=2930, text = "test", id=1000)
+            db.session.add(message)
+            db.session.commit()
+
+            resp = c.post("messages/1000/delete", follow_redirects=True)
+            self.assertEqual(resp.status_code, 200)
+
+            message = Message.query.get(1000)
+            self.assertIsNotNone(message)
+    
