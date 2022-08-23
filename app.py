@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, flash, redirect, session, g
+from flask import Flask, render_template, request, flash, redirect, session, g, abort
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
@@ -164,7 +164,8 @@ def users_show(user_id):
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
-    return render_template('users/show.html', user=user, messages=messages)
+    likes = [message.id for message in user.likes]
+    return render_template('users/show.html', user=user, messages=messages, likes=likes)
 
 
 @app.route('/users/<int:user_id>/following')
@@ -253,6 +254,11 @@ def delete_user():
 
     return redirect("/signup")
 
+@app.route('/users/<int:user_id>/likes')
+def show_likes(user_id):
+    redirect_if_not_logged_in()
+    user = User.query.get_or_404(user_id)
+    return render_template('users/show.html', user=user, messages=user.likes)
 
 ##############################################################################
 # Messages routes:
@@ -298,6 +304,25 @@ def messages_destroy(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
+@app.route('/messages/<int:message_id>/like', methods=['POST'])
+def toggle_like(message_id):
+    """Like a message for the current user, if the message is already liked remove it instead"""
+    redirect_if_not_logged_in()
+
+    message = Message.query.get_or_404(message_id)
+    if message.user_id == g.user.id: # can't like own messages
+        return abort(403)
+    
+    likes = g.user.likes
+
+    if message in likes:
+        g.user.likes = [like for like in likes if like != message]
+    else:
+        g.user.likes.append(message)
+
+    db.session.commit()
+    return redirect('/')
+
 
 ##############################################################################
 # Homepage and error pages
@@ -312,6 +337,7 @@ def homepage():
     """
     if g.user:
         followed_id = [followed.id for followed in g.user.following] + [g.user.id]
+        likes = [message.id for message in g.user.likes]
         messages = (Message
                     .query
                     .filter(Message.user_id.in_(followed_id))
@@ -319,7 +345,7 @@ def homepage():
                     .limit(100)
                     .all())
 
-        return render_template('home.html', messages=messages)
+        return render_template('home.html', messages=messages, likes=likes)
 
     else:
         return render_template('home-anon.html')
